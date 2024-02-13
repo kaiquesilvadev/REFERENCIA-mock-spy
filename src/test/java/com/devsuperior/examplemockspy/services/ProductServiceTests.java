@@ -68,4 +68,18 @@ public class ProductServiceTests {
 	    	ProductDTO result = serviceSpy.insert(productDTO);
 		});
 	}
+	
+	@Test
+	public void insertShouldReturnInvalidDataExceptionWhenProductPriceIsNegative() {
+		
+		productDTO.setPrice(-5.0);
+		
+		ProductService serviceSpy = Mockito.spy(service);
+		Mockito.doThrow(InvalidDataException.class).when(serviceSpy).validateData(productDTO);
+		
+		Assertions.assertThrows(InvalidDataException.class, () -> {
+	    	@SuppressWarnings("unused")
+	    	ProductDTO result = serviceSpy.insert(productDTO);
+		});
+	}
 }
