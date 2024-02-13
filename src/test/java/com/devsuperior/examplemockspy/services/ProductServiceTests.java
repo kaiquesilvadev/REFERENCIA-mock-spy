@@ -15,6 +15,7 @@ import com.devsuperior.examplemockspy.dto.ProductDTO;
 import com.devsuperior.examplemockspy.entities.Product;
 import com.devsuperior.examplemockspy.repositories.ProductRepository;
 import com.devsuperior.examplemockspy.services.exceptions.InvalidDataException;
+import com.devsuperior.examplemockspy.services.exceptions.ResourceNotFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -122,4 +123,42 @@ public class ProductServiceTests {
 	    	ProductDTO result = serviceSpy.update(existingProductId, productDTO);
 		});	
 	}
+	@Test
+	public void updateShouldReturnResourceNotFoundExceptionWhenIdDoesNotExistAndValidData() {
+		
+		ProductService serviceSpy = Mockito.spy(service);
+		Mockito.doNothing().when(serviceSpy).validateData(productDTO);
+		
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			ProductDTO result = serviceSpy.update(nonExistingProductId, productDTO);
+		});	
+	}
+	
+	@Test
+	public void updateShouldReturnInvalidDataExceptionWhenIdDoesNotExistAndNameIsBlank() {
+		
+		productDTO.setName("");
+		
+		ProductService serviceSpy = Mockito.spy(service);
+		Mockito.doThrow(InvalidDataException.class).when(serviceSpy).validateData(productDTO);
+
+		
+		Assertions.assertThrows(InvalidDataException.class, () -> {
+			ProductDTO result = serviceSpy.update(nonExistingProductId, productDTO);
+		});	
+	}
+	
+	@Test
+	public void updateShouldReturnInvalidDataExceptionWhenIdDoesNotExistAndPriceIsNegative() {
+		
+		productDTO.setPrice(-5.0);
+		
+		ProductService serviceSpy = Mockito.spy(service);
+		Mockito.doThrow(InvalidDataException.class).when(serviceSpy).validateData(productDTO);
+
+		
+		Assertions.assertThrows(InvalidDataException.class, () -> {
+			ProductDTO result = serviceSpy.update(nonExistingProductId, productDTO);
+		});	
+	}	
 }
